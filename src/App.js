@@ -1,24 +1,49 @@
 import logo from './logo.svg';
 import './App.css';
+import { useReducer, useEffect } from 'react';
+import reducer from './context/reducer';
+import GlobalContext from './context/GlobalContext';
+import PrimaryAppBar from './components/AppBar';
+import CategoryBar from './components/CategoryBar';
+import { SET_CATEGORIES } from './context/action.types';
+const axios = require("axios").default;
+
+const initialState = {
+  setLoading: false,
+  categories:[]
+}
+
 
 function App() {
+  const [state, dispatch] = useReducer(reducer,initialState);
+
+  useEffect(()=>{
+
+    axios.get("https://dummyjson.com/products/categories")
+    .then(res=>{
+      console.log(res);
+      
+      dispatch({
+        type: SET_CATEGORIES,
+        payload: res.data
+      })
+    })
+    .catch(err=>{
+      console.log(err);
+    })
+
+
+
+  },[])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+    <GlobalContext.Provider value={{state, dispatch}}>
+
+
+    
+    <PrimaryAppBar></PrimaryAppBar>
+    <CategoryBar></CategoryBar>
+    </GlobalContext.Provider>
   );
 }
 
